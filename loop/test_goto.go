@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	main2 "study/src/self-study/main"
+)
 
 /*func test1() {
 	i := 1
@@ -25,7 +28,7 @@ END:
 	fmt.Println("END.")
 }
 
-func main() {
+func main2.main() {
 	//test1()
 	test2()
 }
