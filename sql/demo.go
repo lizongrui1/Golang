@@ -7,7 +7,11 @@ import (
 	"log"
 )
 
+<<<<<<< HEAD
 var db *sql.DB // 定义全局变量用来保存数据库连接对象，不需要初始化为 new(sql.DB)
+=======
+var db *sql.DB // 不需要初始化为 new(sql.DB)
+>>>>>>> 1e4d7e73f6cb90c8ba9557c03dd57e4fdc850f87
 
 func initDB() (err error) {
 	db, err = sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/test")
@@ -72,7 +76,11 @@ func insterRow() {
 }
 
 func updateRow() {
+<<<<<<< HEAD
 	ret, err := db.Exec("update users set name, = ? where id = ?", "haha", 4)
+=======
+	ret, err := db.Exec("update users set name = ? where id = ?", "haha", 4)
+>>>>>>> 1e4d7e73f6cb90c8ba9557c03dd57e4fdc850f87
 	if err != nil {
 		fmt.Printf("update failed, errr:%v\n", err)
 		return
