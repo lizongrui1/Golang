@@ -38,14 +38,27 @@ func InitDB() (err error) {
 //// 执行后一定要检查err
 //_, err := db.Exec(query)
 
+func showMenu() {
+	fmt.Println("******************************")
+	fmt.Println("欢迎使用[学生管理系统] V1.0")
+	fmt.Println("1.添加学生")
+	fmt.Println("2.显示全部")
+	fmt.Println("3.查询学生")
+	fmt.Println("4.修改学生")
+	fmt.Println("5.删除学生")
+	fmt.Println()
+	fmt.Println("0.退出系统")
+	fmt.Println("******************************")
+}
+
 func queryRow() {
-	err := db.QueryRow("select id, name, phone from `users` where id=?", 1).Scan(&stu.Id, &stu.Name, &stu.Number)
+	err := db.QueryRow("select id, name, phone from `users` where id=?", 1).Scan(&stu.Id, &stu.Name, &stu.Score)
 	if err != nil {
 		fmt.Printf("scan failed, err: %v\n", err)
 		return
 	}
 	fmt.Println("Query success!")
-	fmt.Printf("id: %d, name: %s, phone: %s\n", stu.Id, stu.Name, stu.Number)
+	fmt.Printf("id: %d, name: %s, phone: %s\n", stu.Id, stu.Name, stu.Score)
 }
 
 func queryMultiRow() {
@@ -57,12 +70,12 @@ func queryMultiRow() {
 	defer rows.Close()
 	fmt.Println("query success!")
 	for rows.Next() {
-		err := rows.Scan(&stu.Id, &stu.Name, &stu.Number)
+		err := rows.Scan(&stu.Id, &stu.Name, &stu.Score)
 		if err != nil {
 			fmt.Println("scan failed, err:%v\n", err)
 			return
 		}
-		fmt.Printf("id: %d, name: %s, phone: %s\n", stu.Id, stu.Name, stu.Number)
+		fmt.Printf("id: %d, name: %s, phone: %s\n", stu.Id, stu.Name, stu.Score)
 	}
 }
 
