@@ -3,18 +3,16 @@ package main
 import (
 	"StudentManagementSystem/module"
 	"fmt"
-	"strconv"
+	"net/http"
 )
 
 func main() {
+	var input int
 	err := module.InitDB()
 	if err != nil {
 		fmt.Printf("Failed to initialize DB: %v\n", err)
 		return
 	}
-
-	//student := module.NewStudent(6, "xiaoli", 10086)
-	//fmt.Printf("Student ID: %d, Name: %s, Score: %d\n", student.Id, student.Name, student.Score)
 
 	for {
 		module.ShowMenu()
@@ -25,7 +23,7 @@ func main() {
 			continue
 		}
 
-		choice, err := strconv.Atoi(input)
+		choice := input
 		if err != nil {
 			fmt.Println("请输入有效的数字")
 			continue
@@ -40,5 +38,16 @@ func main() {
 		if err != nil {
 			fmt.Printf("操作错误: %v\n", err)
 		}
+
+	}
+
+	// 将 queryRowHandler 函数绑定到特定路由
+	http.HandleFunc("/query", module.QueryRowHandler)
+
+	// 启动 HTTP 服务器
+	fmt.Println("Server is running at http://localhost:8080")
+	http.ListenAndServe(":8080", nil)
+	if err != nil {
+		fmt.Println("Error starting server:", err)
 	}
 }

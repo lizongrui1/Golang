@@ -4,25 +4,15 @@ import (
 	"database/sql"
 )
 
-func db_init() *sql.DB {
-	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/test")
+func InitDB() *sql.DB {
+	db, err := sql.Open("mysql", "root:12345678@tcp(127.0.0.1:3306)/studb")
 	//if err != nil {
 	//	panic(err)
 	//}
 	checkError(err)
-
 	err = db.Ping()
 	checkError(err)
-
-	query := `
-	CREATE TABLE users (
-	   id INT AUTO_INCREMENT PRIMARY KEY,
-	   name TEXT NOT NULL,
-	   score INT AUTO_INCREMENT,
-	   PRIMARY KEY (id)
-	);`
-	_, err = db.Exec(query)
-	checkError(err)
-
+	db.Exec("use test")
+	defer db.Close()
 	return db
 }

@@ -8,32 +8,17 @@ import (
 	"strings"
 )
 
-var db = db_init()
+var db = InitDB()
 
 type myUsualType interface{}
 
-/*func InitDB() error {
-	var err error
-	db, err = sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/test")
-	if err != nil {
-		log.Fatal(err)
-		return err
-	}
-	fmt.Println("数据库连接成功...")
+type Student struct {
+	Id    int
+	Name  string
+	Score int
+}
 
-	err = db.Ping()
-	if err != nil {
-		return err
-	}
-	return nil
-}*/
-
-//create table users(
-//id int primary key auto_increment,
-//username varchar(100) not null unique,
-//password varchar(100) not null,
-//email varchar(100)
-//)
+var stu = new(Student)
 
 func ShowMenu() {
 	fmt.Println("-----------------------------")
@@ -117,7 +102,7 @@ func FunctionChoose(button int) error {
 		if err != nil {
 			return err
 		}
-		err = insertRow(s.Id, s.Name, s.Score)
+		err = insertRow(s.Name, s.Score)
 		if err != nil {
 			return err
 		}
@@ -141,46 +126,52 @@ func FunctionChoose(button int) error {
 	return err
 }
 
-// 功能。。。
+// 查看学生
 func queryRow(id int) error {
 	var stu Student // 假设 Student 是一个定义好的结构体
-	err := db.QueryRow("select * from `users` where id=?", id).Scan(&stu.Id, &stu.Name, &stu.Score)
+	err := db.QueryRow("select * from `sms` where id=?", id).Scan(&stu.Id, &stu.Name, &stu.Score)
 	if err != nil {
 		fmt.Printf("scan failed, err: %v\n", err)
 		return err
 	}
+	//defer db.Close()
 	fmt.Println("查询成功!")
-	fmt.Printf("学号: %d, 姓名: %s, 分数: %s\n", stu.Id, stu.Name, stu.Score)
+	fmt.Printf("学号: %d, 姓名: %s, 分数: %d\n", stu.Id, stu.Name, stu.Score)
 	return nil
 }
 
+// 多行查看
 func queryMultiRow() error {
-	rows, err := db.Query("select * from users")
+	rows, err := db.Query("select * from sms")
 	if err != nil {
-		fmt.Println("query failed, err:%v\n", err)
-		return nil
+		fmt.Printf("query failed, err:%v\n", err)
+		return err
 	}
 	defer rows.Close()
-
 	fmt.Println("查询成功!")
 	for rows.Next() {
 		err := rows.Scan(&stu.Id, &stu.Name, &stu.Score)
 		if err != nil {
-			fmt.Println("scan failed, err:%v\n", err)
-			return nil
+			fmt.Printf("scan failed, err:%v\n", err)
+			return err
 		}
 		fmt.Printf("学号: %d, 姓名: %s, 分数: %s\n", stu.Id, stu.Name, stu.Score)
+	}
+	if err := rows.Err(); err != nil {
+		fmt.Printf("iteration failed, err:%v\n", err)
+		return err
 	}
 	return nil
 }
 
-func insertRow(id int, name string, score int) error {
-	ret, err := db.Exec("insert into users(id, name, score) values (?, ?, ?)", id, name, score)
+// 增加学生
+func insertRow(name string, score int) error {
+	ret, err := db.Exec("insert into sms(id, name, score) values (?, ?, ?)", name, score)
 	if err != nil {
 		fmt.Printf("insert failed, err:%v\n", err)
 		return err
 	}
-	insertedId, err := ret.LastInsertId()
+	insertedId, err := ret.LastInsertId() //获取插入操作的最后插入的自增主键
 	if err != nil {
 		fmt.Printf("get lastinsert ID failed, err:%v\n", err)
 		return err
@@ -189,24 +180,26 @@ func insertRow(id int, name string, score int) error {
 	return nil
 }
 
+// 修改学生
 func updateRow(id int, item string, newValue myUsualType) error {
-	sqlStr := fmt.Sprintf("update users set%s = ? where id = ?", item, id)
+	sqlStr := fmt.Sprintf("update sms set%s = ? where id%v = ?", item, id)
 	ret, err := db.Exec(sqlStr, newValue, id)
 	if err != nil {
 		fmt.Printf("更新失败, errr:%v\n", err)
 		return nil
 	}
-	n, err := ret.RowsAffected()
+	n, err := ret.RowsAffected() //获取受影响的行数
 	if err != nil {
 		fmt.Printf("get RowsAffected failed, err:%v\n", err)
 		return nil
 	}
 	fmt.Printf("更新成功, affected rows: %d\n", n)
-	return nil
+	return err
 }
 
+// 删除学生
 func deleteRow(id int) (err error) {
-	ret, err := db.Exec("delete from users where id = ?", id)
+	ret, err := db.Exec("delete from sms where id = ?", id)
 	if err != nil {
 		fmt.Printf("删除失败, err:%v\n", err)
 		return
