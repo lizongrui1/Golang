@@ -2,10 +2,14 @@ package module
 
 import (
 	"database/sql"
+	"html/template"
 )
 
+var tpl *template.Template
+
 func InitDB() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/studb")
+	tpl = template.Must(template.ParseGlob("templates/*.html"))
+	db, err := sql.Open("mysql", "root:12345678@tcp(127.0.0.1:3306)/studb")
 	if err != nil {
 		return nil, err
 	}

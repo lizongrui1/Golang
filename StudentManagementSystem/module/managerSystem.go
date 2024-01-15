@@ -38,14 +38,16 @@ func FunctionChoose(button int) error {
 	switch button {
 	case 1:
 		// 查询所有学生信息
-		err = queryMultiRow()
-		//if err != nil {
-		//	return err
-		//}
-		checkError(err) //后面if err..未进行修改
+		students, err := queryMultiRow()
+		if err != nil {
+			return err
+		}
+		for _, student := range students {
+			fmt.Printf("学号: %d, 姓名: %s, 分数: %d\n", student.Id, student.Name, student.Score)
+		}
 
 	case 2:
-		// 查询单个学生信息
+		// 查询指定学生信息
 		var id int
 		fmt.Printf("请输入查询的学生学号：")
 		_, err = fmt.Scan(&id)
@@ -129,7 +131,7 @@ func FunctionChoose(button int) error {
 // 查看学生
 func queryRow(id int) error {
 	var stu Student // 假设 Student 是一个定义好的结构体
-	err := db.QueryRow("select * from `sms` where id=?", id).Scan(&stu.Id, &stu.Name, &stu.Score)
+	err := db.QueryRow("select * from `sms` where sms.sid=?", id).Scan(&stu.Id, &stu.Name, &stu.Score)
 	if err != nil {
 		fmt.Printf("scan failed, err: %v\n", err)
 		return err
@@ -141,32 +143,37 @@ func queryRow(id int) error {
 }
 
 // 多行查看
-func queryMultiRow() error {
-	rows, err := db.Query("select * from sms")
+func queryMultiRow() ([]Student, error) {
+	rows, err := db.Query("SELECT sid, sname, score FROM sms")
 	if err != nil {
-		fmt.Printf("query failed, err:%v\n", err)
-		return err
+		fmt.Printf("查询失败, err:%v\n", err)
+		return nil, err
 	}
 	defer rows.Close()
-	fmt.Println("查询成功!")
+
+	var students []Student // 创建一个空的Student切片用于存储学生数据
+
 	for rows.Next() {
+		var stu Student // 使用Student结构体来存储每行的数据
 		err := rows.Scan(&stu.Id, &stu.Name, &stu.Score)
 		if err != nil {
-			fmt.Printf("scan failed, err:%v\n", err)
-			return err
+			fmt.Printf("赋值失败, err:%v\n", err)
+			continue // 发生错误时继续处理下一行
 		}
-		fmt.Printf("学号: %d, 姓名: %s, 分数: %s\n", stu.Id, stu.Name, stu.Score)
+		students = append(students, stu) // 将学生对象添加到切片中
 	}
+
 	if err := rows.Err(); err != nil {
 		fmt.Printf("iteration failed, err:%v\n", err)
-		return err
+		return nil, err
 	}
-	return nil
+
+	return students, nil // 返回学生切片和错误信息
 }
 
 // 增加学生
 func insertRow(name string, score int) error {
-	ret, err := db.Exec("insert into sms(id, name, score) values (?, ?, ?)", name, score)
+	ret, err := db.Exec("insert into sms(sid, sname, score) values (?, ?, ?)", name, score)
 	if err != nil {
 		fmt.Printf("insert failed, err:%v\n", err)
 		return err
@@ -199,7 +206,7 @@ func updateRow(id int, item string, newValue myUsualType) error {
 
 // 删除学生
 func deleteRow(id int) (err error) {
-	ret, err := db.Exec("delete from sms where id = ?", id)
+	ret, err := db.Exec("delete from sms where sid = ?", id)
 	if err != nil {
 		fmt.Printf("删除失败, err:%v\n", err)
 		return

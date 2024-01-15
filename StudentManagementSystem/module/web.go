@@ -2,12 +2,9 @@ package module
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"strconv"
 )
-
-var tpl *template.Template
 
 // 获取所有学生信息的Handler
 func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
@@ -39,6 +36,8 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 
 		fmt.Fprintf(w, "成功添加学生，ID为 %d", id)
 	}
+
+	tpl.ExecuteTemplate(w, "index.html", students)
 }
 
 // 添加学生信息的Handler
