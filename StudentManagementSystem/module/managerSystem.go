@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var db = InitDB()
+var db, _ = InitDB()
 
 type myUsualType interface{}
 
