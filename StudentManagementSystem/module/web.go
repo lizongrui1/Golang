@@ -28,7 +28,7 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		insertRow(name, score)
 		// http.Redirect(w, r, "/", http.StatusSeeOther)
-		err = queryMultiRow()
+		err = queryRow()
 		if err != nil {
 			http.Error(w, fmt.Sprintf("插入行时出错: %v", err), http.StatusInternalServerError)
 			return
@@ -37,7 +37,7 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "成功添加学生，ID为 %d", id)
 	}
 
-	tpl.ExecuteTemplate(w, "index.html", students)
+	tpl.ExecuteTemplate(w, "index.html", student)
 }
 
 // 添加学生信息的Handler

@@ -1,11 +1,8 @@
 package module
 
 import (
-	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"strconv"
-	"strings"
 )
 
 var db, _ = InitDB()
@@ -33,100 +30,100 @@ func ShowMenu() {
 	fmt.Println("-----------------------------")
 }
 
-func FunctionChoose(button int) error {
-	var err error
-	switch button {
-	case 1:
-		// 查询所有学生信息
-		students, err := queryMultiRow()
-		if err != nil {
-			return err
-		}
-		for _, student := range students {
-			fmt.Printf("学号: %d, 姓名: %s, 分数: %d\n", student.Id, student.Name, student.Score)
-		}
-
-	case 2:
-		// 查询指定学生信息
-		var id int
-		fmt.Printf("请输入查询的学生学号：")
-		_, err = fmt.Scan(&id)
-		if err != nil {
-			return err
-		}
-		err = queryRow(id)
-		if err != nil {
-			return err
-		}
-
-	case 3:
-		var (
-			id       int
-			item     string
-			newValue string //获取的newValue初始都设置成string类型，得到值后，进行类型转换
-			a        myUsualType
-		)
-		fmt.Printf("请输入修改信息的学生学号：")
-		_, err = fmt.Scan(&id)
-		if err != nil {
-			return err
-		}
-		//如果学生信息不存在，需要报错返回 查询学生信息的操作
-		err = queryRow(id)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("请输入修改的信息：（字段 新值）")
-		_, err = fmt.Scan(&item, &newValue)
-		if err != nil {
-			return err
-		}
-		//将获取的item字段更改为小写
-		item = strings.ToLower(item)
-		//newValue的类型转换
-		if item == "id" || item == "age" || item == "chinese" || item == "math" || item == "english" {
-			a, err = strconv.ParseInt(newValue, 10, 0) //string 转int64
-			if err != nil {
-				return err
-			}
-		} else {
-			a = fmt.Sprintf("'%v'", newValue)
-		}
-		err = updateRow(id, item, a)
-		if err != nil {
-			return err
-		}
-
-	case 4:
-		var s Student
-		fmt.Println("请输入新增学生信息：\n", "(学号，姓名，成绩)")
-		_, err = fmt.Scan(&s.Id, &s.Name, &s.Score)
-		if err != nil {
-			return err
-		}
-		err = insertRow(s.Name, s.Score)
-		if err != nil {
-			return err
-		}
-
-	case 5:
-		// 删除学生信息
-		var id int
-		fmt.Printf("请输入删除的学生学号：")
-		_, err = fmt.Scan(&id)
-		if err != nil {
-			return err
-		}
-		err = deleteRow(id)
-		if err != nil {
-			return err
-		}
-	default:
-		err = errors.New("输入错误！")
-		return err
-	}
-	return err
-}
+//func FunctionChoose(button int) error {
+//	var err error
+//	switch button {
+//	case 1:
+//		// 查询所有学生信息
+//		students, err := queryMultiRow()
+//		if err != nil {
+//			return err
+//		}
+//		for _, student := range students {
+//			fmt.Printf("学号: %d, 姓名: %s, 分数: %d\n", student.Id, student.Name, student.Score)
+//		}
+//
+//	case 2:
+//		// 查询指定学生信息
+//		var id int
+//		fmt.Printf("请输入查询的学生学号：")
+//		_, err = fmt.Scan(&id)
+//		if err != nil {
+//			return err
+//		}
+//		err = queryRow(id)
+//		if err != nil {
+//			return err
+//		}
+//
+//	case 3:
+//		var (
+//			id       int
+//			item     string
+//			newValue string //获取的newValue初始都设置成string类型，得到值后，进行类型转换
+//			a        myUsualType
+//		)
+//		fmt.Printf("请输入修改信息的学生学号：")
+//		_, err = fmt.Scan(&id)
+//		if err != nil {
+//			return err
+//		}
+//		//如果学生信息不存在，需要报错返回 查询学生信息的操作
+//		err = queryRow(id)
+//		if err != nil {
+//			return err
+//		}
+//		fmt.Printf("请输入修改的信息：（字段 新值）")
+//		_, err = fmt.Scan(&item, &newValue)
+//		if err != nil {
+//			return err
+//		}
+//		//将获取的item字段更改为小写
+//		item = strings.ToLower(item)
+//		//newValue的类型转换
+//		if item == "id" || item == "age" || item == "chinese" || item == "math" || item == "english" {
+//			a, err = strconv.ParseInt(newValue, 10, 0) //string 转int64
+//			if err != nil {
+//				return err
+//			}
+//		} else {
+//			a = fmt.Sprintf("'%v'", newValue)
+//		}
+//		err = updateRow(id, item, a)
+//		if err != nil {
+//			return err
+//		}
+//
+//	case 4:
+//		var s Student
+//		fmt.Println("请输入新增学生信息：\n", "(学号，姓名，成绩)")
+//		_, err = fmt.Scan(&s.Id, &s.Name, &s.Score)
+//		if err != nil {
+//			return err
+//		}
+//		err = insertRow(s.Name, s.Score)
+//		if err != nil {
+//			return err
+//		}
+//
+//	case 5:
+//		// 删除学生信息
+//		var id int
+//		fmt.Printf("请输入删除的学生学号：")
+//		_, err = fmt.Scan(&id)
+//		if err != nil {
+//			return err
+//		}
+//		err = deleteRow(id)
+//		if err != nil {
+//			return err
+//		}
+//	default:
+//		err = errors.New("输入错误！")
+//		return err
+//	}
+//	return err
+//}
 
 // 查看学生
 func queryRow(id int) error {
