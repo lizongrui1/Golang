@@ -17,6 +17,12 @@ type Student struct {
 
 var stu = new(Student)
 
+<<<<<<< HEAD
+// 查看学生
+func queryRow(id int) error {
+	var stu Student // 假设 Student 是一个定义好的结构体
+	err := db.QueryRow("select * from `sms` where sms.id=?", id).Scan(&stu.Id, &stu.Name, &stu.Score)
+=======
 func ShowMenu() {
 	fmt.Println("-----------------------------")
 	fmt.Println("欢迎使用学生管理系统 V1.0")
@@ -129,6 +135,7 @@ func ShowMenu() {
 func queryRow(id int) error {
 	var stu Student // 假设 Student 是一个定义好的结构体
 	err := db.QueryRow("select * from `sms` where sms.sid=?", id).Scan(&stu.Id, &stu.Name, &stu.Score)
+>>>>>>> 6f45ca077e45fe2b265c28107e07681450dc02a6
 	if err != nil {
 		fmt.Printf("scan failed, err: %v\n", err)
 		return err
@@ -141,7 +148,11 @@ func queryRow(id int) error {
 
 // 多行查看
 func queryMultiRow() ([]Student, error) {
+<<<<<<< HEAD
+	rows, err := db.Query("SELECT id, name, score FROM sms")
+=======
 	rows, err := db.Query("SELECT sid, sname, score FROM sms")
+>>>>>>> 6f45ca077e45fe2b265c28107e07681450dc02a6
 	if err != nil {
 		fmt.Printf("查询失败, err:%v\n", err)
 		return nil, err
@@ -185,20 +196,24 @@ func insertRow(name string, score int) error {
 }
 
 // 修改学生
-func updateRow(id int, item string, newValue myUsualType) error {
-	sqlStr := fmt.Sprintf("update sms set%s = ? where id%v = ?", item, id)
+func updateRow(id int, newValue myUsualType) error {
+	sqlStr := "UPDATE sms SET score = ? WHERE id = ?"
 	ret, err := db.Exec(sqlStr, newValue, id)
 	if err != nil {
-		fmt.Printf("更新失败, errr:%v\n", err)
-		return nil
+		fmt.Printf("更新失败, error: %v\n", err)
+		return err
 	}
-	n, err := ret.RowsAffected() //获取受影响的行数
+	rowsAffected, err := ret.RowsAffected()
 	if err != nil {
-		fmt.Printf("get RowsAffected failed, err:%v\n", err)
+		fmt.Printf("获取更新行数时发生错误: %v\n", err)
+		return err
+	}
+	if rowsAffected == 0 {
+		fmt.Println("没有找到对应的ID, 未进行更新")
 		return nil
 	}
-	fmt.Printf("更新成功, affected rows: %d\n", n)
-	return err
+	fmt.Printf("更新成功")
+	return nil
 }
 
 // 删除学生

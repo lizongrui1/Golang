@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Student Score</title>
+</head>
+<body>
+
+<h2>查询学生成绩</h2>
+
+<form id="queryForm">
+    <!-- Field for entering student ID to query -->
+    <label for="id">学生学号:</label>
+    <input type="text" id="id" name="id" required><br>
+
+    <input type="button" value="查询" onclick="queryScore()">
+</form>
+
+<script>
+    /*function queryScore() {
+        // Get the student ID entered by the user
+        var studentID = document.getElementById("id").value;
+
+        // TODO: Perform AJAX request to server to query score by student ID
+        // Example: You might use Fetch API or XMLHttpRequest to send a request to the server
+
+        // For now, let's show a simple alert as a placeholder
+        alert("学生学号为 " + studentID + " 的成绩是：90"); // Replace with actual response from the server
+    }*/
+</script>
+
+</body>
+</html>
