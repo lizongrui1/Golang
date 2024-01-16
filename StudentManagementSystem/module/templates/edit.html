@@ -7,20 +7,19 @@
 </head>
 <body>
 
-<h2>Edit Student Information</h2>
+<h2>修改学生成绩</h2>
 
 <form action="/update" method="post">
-<!-- Hidden input field for student ID -->
+
 <input type="hidden" name="id" value="{{.ID}}">
 
-<!-- Fields for editing student information -->
-<label for="name">Name:</label>
+<label for="name">学生姓名:</label>
 <input type="text" id="name" name="name" value="" required><br>
 
-<label for="score">Score:</label>
+<label for="score">学生分数:</label>
 <input type="text" id="score" name="score" value="" required><br>
 
-<input type="submit" value="Update">
+<input type="submit" value="提交">
 </form>
 
 </body>

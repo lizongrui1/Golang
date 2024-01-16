@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Student Management System V1.0</title>
+    <title>Student Management System</title>
 </head>
 <body>
-<h2>欢迎使用学生管理系统 V1.0</h2>
+<h2>欢迎使用学生管理系统</h2>
 <p>1. 显示所有学生的信息</p>
 <p>2. 显示指定学生的信息</p>
 <p>3. 学生信息修改</p>
@@ -21,25 +21,27 @@
         var choice = document.getElementById("choice").value;
         switch (choice) {
             case '1':
-                alert('显示所有学生的信息');
+                window.location.href = "/static/query.html";
                 break;
             case '2':
-                alert('显示指定学生的信息');
+                window.location.href = "/static/query.html";
                 break;
             case '3':
-                alert('学生信息修改');
+                // 跳转到编辑学生信息的页面
+                window.location.href = "/static/edit.html";
                 break;
             case '4':
-                alert('新增学生信息');
+                window.location.href = "/static/add.html";
                 break;
             case '5':
-                alert('删除学生信息');
+                window.location.href = "/static/delete.html";
                 break;
             case '0':
                 alert('退出系统');
+                window.close();
                 break;
             default:
-                alert('无效的选项');
+                alert('选项无效，请重新输入');
         }
     }
 </script>

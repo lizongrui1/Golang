@@ -2,9 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Student Score</title>
 </head>
 <body>
+
+<h2>添加学生成绩</h2>
+
+<form action="/insert" method="post">
+    <label for="name">学生姓名:</label>
+    <input type="text" id="name" name="name" required><br>
+
+    <label for="score">学生分数:</label>
+    <input type="text" id="score" name="score" required><br>
+
+    <input type="submit" value="提交">
+</form>
 
 </body>
 </html>
