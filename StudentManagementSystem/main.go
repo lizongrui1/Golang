@@ -3,55 +3,51 @@ package main
 import (
 	"StudentManagementSystem/module"
 	"fmt"
-	"log"
 	"net/http"
+	"strconv"
 )
 
 func main() {
-	db, err := module.InitDB()
+	err := module.InitDB()
 	if err != nil {
-		log.Fatalf("数据库初始化失败: %v\n", err)
+		fmt.Printf("Failed to initialize DB: %v\n", err)
 		return
 	}
-	defer db.Close()
 
-	// 设置静态文件服务
-<<<<<<< HEAD
-	fs := http.FileServer(http.Dir("./module/templates"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	for {
+		module.ShowMenu()
+		fmt.Println("请输入选项：")
+		_, err := fmt.Scanln(&input)
+		if err != nil {
+			fmt.Printf("输入错误: %v\n", err)
+			continue
+		}
 
-	// 设置主页路由
-	http.HandleFunc("/", module.HomeHandler)
-	// 设置其他路径的路由
-=======
-	fs := http.FileServer(http.Dir("./static"))
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+		choice, err := strconv.Atoi(input)
+		if err != nil {
+			fmt.Println("请输入有效的数字")
+			continue
+		}
 
-	// 设置路由
-	http.HandleFunc("/", homeHandler)
->>>>>>> 6f45ca077e45fe2b265c28107e07681450dc02a6
-	http.HandleFunc("/query", module.QueryRowHandler)
-	http.HandleFunc("/insert", module.InsertRowHandler)
-	http.HandleFunc("/update", module.UpdateRowHandler)
-	http.HandleFunc("/delete", module.DeleteRowHandler)
+		if choice == 0 {
+			fmt.Println("退出系统...")
+			break
+		}
+
+		err = module.FunctionChoose(choice)
+		if err != nil {
+			fmt.Printf("操作错误: %v\n", err)
+		}
+
+	}
+
+	// 将 queryRowHandler 函数绑定到特定路由
+	http.HandleFunc("/query", QueryRowHandler)
 
 	// 启动 HTTP 服务器
-<<<<<<< HEAD
-	fmt.Println("服务器运行在 http://localhost:8080")
-	err = http.ListenAndServe("localhost:8080", nil)
+	fmt.Println("Server is running at http://localhost:8080")
+	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		log.Fatal("发生错误:", err)
-=======
-	fmt.Println("服务器运行在 http://localhost:8000")
-	err = http.ListenAndServe(":8000", nil)
-	if err != nil {
-		log.Fatal("Error starting server:", err)
->>>>>>> 6f45ca077e45fe2b265c28107e07681450dc02a6
+		fmt.Println("Error starting server:", err)
 	}
-}
-
-// homeHandler 用于处理主页请求并显示主页 HTML
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-	// 这里填充用于生成主页的代码，例如加载 HTML 文件
-	http.ServeFile(w, r, "./templates/index.html")
 }
