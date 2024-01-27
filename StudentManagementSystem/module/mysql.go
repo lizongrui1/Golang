@@ -6,6 +6,7 @@ import (
 	"html/template"
 )
 
+<<<<<<< HEAD
 var tpl *template.Template
 
 func InitDB() (*sql.DB, error) {
@@ -26,4 +27,17 @@ func InitDB() (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+=======
+func InitDB() *sql.DB {
+	db, err := sql.Open("mysql", "root:123456@tcp(127.0.0.1:3306)/test")
+	//if err != nil {
+	//	panic(err)
+	//}
+	checkError(err)
+	err = db.Ping()
+	checkError(err)
+	db.Exec("use test")
+	defer db.Close()
+	return db
+>>>>>>> 688cf5ed53b85b39b20b54793577ffe795686929
 }

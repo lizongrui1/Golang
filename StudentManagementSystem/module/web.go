@@ -36,8 +36,14 @@ func QueryRowHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "查询失败", http.StatusInternalServerError)
 			return
 		}
+<<<<<<< HEAD
 		//在模板中使用查询结果
 		err = tpl.ExecuteTemplate(w, "query.html", stu)
+=======
+		insertRow(id, name, score)
+		//http.Redirect(w, r, "/", http.StatusSeeOther)
+		err = queryMultiRow()
+>>>>>>> 688cf5ed53b85b39b20b54793577ffe795686929
 		if err != nil {
 			return
 		}

@@ -15,7 +15,117 @@ type Student struct {
 	Score int
 }
 
+<<<<<<< HEAD
 //var stu = new(Student)
+=======
+var stu = new(Student)
+
+func ShowMenu() {
+	fmt.Println("-----------------------------")
+	fmt.Println("欢迎使用学生管理系统 V1.0")
+	fmt.Println("1.显示所有学生的信息")
+	fmt.Println("2.显示指定学生的信息")
+	fmt.Println("3.学生信息修改")
+	fmt.Println("4.新增学生信息")
+	fmt.Println("5.删除学生信息")
+	fmt.Println()
+	fmt.Println("0.退出系统")
+	fmt.Println("-----------------------------")
+}
+
+func FunctionChoose(button int) error {
+	var err error
+	switch button {
+	case 1:
+		// 查询所有学生信息
+		err = queryMultiRow()
+		//if err != nil {
+		//	return err
+		//}
+		checkError(err) //后面if err..未进行修改
+
+	case 2:
+		// 查询单个学生信息
+		var id int
+		fmt.Printf("请输入查询的学生学号：")
+		_, err = fmt.Scan(&id)
+		if err != nil {
+			return err
+		}
+		err = queryRow(id)
+		if err != nil {
+			return err
+		}
+
+	case 3:
+		var (
+			id       int
+			item     string
+			newValue string //获取的newValue初始都设置成string类型，得到值后，进行类型转换
+			a        myUsualType
+		)
+		fmt.Printf("请输入修改信息的学生学号：")
+		_, err = fmt.Scan(&id)
+		if err != nil {
+			return err
+		}
+		//如果学生信息不存在，需要报错返回 查询学生信息的操作
+		err = queryRow(id)
+		if err != nil {
+			return err
+		}
+		fmt.Printf("请输入修改的信息：（字段 新值）")
+		_, err = fmt.Scan(&item, &newValue)
+		if err != nil {
+			return err
+		}
+		//将获取的item字段更改为小写
+		item = strings.ToLower(item)
+		//newValue的类型转换
+		if item == "id" || item == "age" || item == "chinese" || item == "math" || item == "english" {
+			a, err = strconv.ParseInt(newValue, 10, 0) //string 转int64
+			if err != nil {
+				return err
+			}
+		} else {
+			a = fmt.Sprintf("'%v'", newValue)
+		}
+		err = updateRow(id, item, a)
+		if err != nil {
+			return err
+		}
+
+	case 4:
+		var s Student
+		fmt.Println("请输入新增学生信息：\n", "(学号，姓名，成绩)")
+		_, err = fmt.Scan(&s.Id, &s.Name, &s.Score)
+		if err != nil {
+			return err
+		}
+		err = insertRow(s.Id, s.Name, s.Score)
+		if err != nil {
+			return err
+		}
+
+	case 5:
+		// 删除学生信息
+		var id int
+		fmt.Printf("请输入删除的学生学号：")
+		_, err = fmt.Scan(&id)
+		if err != nil {
+			return err
+		}
+		err = deleteRow(id)
+		if err != nil {
+			return err
+		}
+	default:
+		err = errors.New("输入错误！")
+		return err
+	}
+	return err
+}
+>>>>>>> 688cf5ed53b85b39b20b54793577ffe795686929
 
 // 查看学生
 func queryRow(id int) (student Student, err error) {
@@ -60,8 +170,13 @@ func queryMultiRow() ([]Student, error) {
 }
 
 // 增加学生
+<<<<<<< HEAD
 func insertRow(name string, score int) error {
 	ret, err := db.Exec("INSERT INTO sms (name, score) VALUES (?, ?)", name, score)
+=======
+func insertRow(id int, name string, score int) error {
+	ret, err := db.Exec("insert into sms(id, name, score) values (?, ?, ?)", id, name, score)
+>>>>>>> 688cf5ed53b85b39b20b54793577ffe795686929
 	if err != nil {
 		fmt.Printf("添加失败, err:%v\n", err)
 		return err
