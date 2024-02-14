@@ -3,10 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
+    <style>
+        /* 用于将时间显示在右上角 */
+        #currentTimeContainer {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+    <script>
+        function updateTime() {
+            var now = new Date();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var seconds = now.getSeconds();
+            var timeString = hours.toString().padStart(2, '0') + ':' + minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        window.onload = function () {
+            updateTime();
+            setInterval(updateTime, 1000);
+        };
+    </script>
 </head>
 <body>
 
 <h2>学生管理系统</h2>
+
+<!-- 在右上角添加一个容器，用于显示当前时间 -->
+<div id="currentTimeContainer">
+    <span>当前时间为：</span>
+    <span id="currentTime"></span>
+</div>
 
 <form action="/login" method="post">
     <label for="username">用户名:</label>
@@ -15,8 +44,12 @@
     <label for="password">密码:</label>
     <input type="password" id="password" name="password" required><br><br>
 
-    <input type="submit" value="登录">
+    <input type="submit" name="action" value="学生登录">
+    <input type="submit" name="action" value="管理员登录">
+
 </form>
+
+<a href="/register">学生注册</a>
 
 </body>
 </html>

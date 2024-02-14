@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Student</title>
+</head>
+<body>
+
+<h2>修改学生成绩</h2>
+
+<form action="/update" method="post">
+
+<input type="hidden" name="id" value="{{.ID}}">
+
+<label for="number">学生学号:</label>
+<input type="text" id="number" name="number" value="" required><br>
+
+<label for="score">学生分数:</label>
+<input type="text" id="score" name="score" value="" required><br>
+
+<input type="submit" value="提交">
+</form>
+
+</body>
+</html>

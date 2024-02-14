@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Student Management System</title>
+</head>
+<body>
+<h2>欢迎使用选课系统</h2>
+
+{{if .SuccessMessage}}
+<div>{{.SuccessMessage}}</div>
+{{end}}
+
+<form id="student-form" action="/studentSelect" method="post"> <!-- 注意这里action应该指向/studentSelect -->
+    <label for="student-options">请选择你要选修的课程：</label>
+    <select name="student-options" id="student-options">
+        <option value="数学课">数学课</option>
+        <option value="语文课">语文课</option>
+        <option value="英语课">英语课</option>
+        <option value="政治课">政治课</option>
+        <option value="地理课">地理课</option>
+        <option value="化学课">化学课</option>
+    </select>
+    <br><br>
+    <input type="submit" value="提交">
+</form>
+
+</body>
+</html>

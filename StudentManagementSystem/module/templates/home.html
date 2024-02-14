@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Student Management System</title>
+</head>
+<body>
+<h2>欢迎使用学生管理系统</h2>
+
+<form id="student-form">
+    <label for="student-options">请选择操作：</label>
+    <select name="student-options" id="student-options">
+        <option value="1">显示所有学生的信息</option>
+        <option value="2">显示指定学生的信息</option>
+        <option value="3">修改学生信息</option>
+        <option value="4">新增学生信息</option>
+        <option value="5">删除学生信息</option>
+        <option value="0">退出系统</option>
+    </select>
+    <br><br>
+    <input type="submit" value="提交">
+</form>
+
+<script>
+    document.getElementById('student-form').addEventListener('submit', function(event) {
+        event.preventDefault(); // 阻止表单默认提交行为
+        var choice = document.getElementById('student-options').value;
+        switch (choice) {
+            case '1':
+                window.location.href = "/queryAll";
+                break;
+            case '2':
+                window.location.href = "/static/query.html";
+                break;
+            case '3':
+                window.location.href = "/static/update.html";
+                break;
+            case '4':
+                window.location.href = "/insert";
+                break;
+            case '5':
+                window.location.href = "/static/delete.html";
+                break;
+            default:
+                alert('退出系统，请关闭网页');
+                window.location.href = "/static/login.html";
+                break;
+        }
+    });
+</script>
+</body>
+</html>

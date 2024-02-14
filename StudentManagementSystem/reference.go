@@ -128,7 +128,7 @@ package main
 //			http.Error(w, err.Error(), http.StatusInternalServerError)
 //			return
 //		}
-//		tpl.ExecuteTemplate(w, "edit.html", student)
+//		tpl.ExecuteTemplate(w, "update.html", student)
 //	}
 //}
 //

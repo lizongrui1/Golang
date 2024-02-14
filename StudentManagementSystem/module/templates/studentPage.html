@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生信息</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        .button-link {
+            display: inline-block;
+            text-decoration: none;
+            color: initial;
+        }
+        button {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>学生信息表</h2>
+
+<table>
+    <tr>
+        <th>姓名</th>
+        <th>学号</th>
+        <th>成绩</th>
+    </tr>
+    <tr>
+        <td>{{.Name}}</td>
+        <td>{{.Number}}</td>
+        <td>{{.Score}}</td>
+    </tr>
+</table>
+
+<a href="/studentSelect" class="button-link">
+    <button type="button">继续选课</button>
+</a>
+
+</body>
+</html>

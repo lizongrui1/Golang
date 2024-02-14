@@ -1,219 +1,179 @@
 package module
 
 import (
+	"context"
+	"database/sql"
+	"encoding/json"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/redis/go-redis/v9"
+	"log"
+	"time"
 )
 
 var db, _ = InitDB()
 
+var rdb *redis.Client
+var ctx = context.Background()
+
 type myUsualType interface{}
 
 type Student struct {
-	Id    int
-	Name  string
-	Score int
+	Number int `json:"number"`
+	Name   string
+	Score  int
 }
 
-<<<<<<< HEAD
-//var stu = new(Student)
-=======
-var stu = new(Student)
-
-func ShowMenu() {
-	fmt.Println("-----------------------------")
-	fmt.Println("欢迎使用学生管理系统 V1.0")
-	fmt.Println("1.显示所有学生的信息")
-	fmt.Println("2.显示指定学生的信息")
-	fmt.Println("3.学生信息修改")
-	fmt.Println("4.新增学生信息")
-	fmt.Println("5.删除学生信息")
-	fmt.Println()
-	fmt.Println("0.退出系统")
-	fmt.Println("-----------------------------")
-}
-
-func FunctionChoose(button int) error {
-	var err error
-	switch button {
-	case 1:
-		// 查询所有学生信息
-		err = queryMultiRow()
-		//if err != nil {
-		//	return err
-		//}
-		checkError(err) //后面if err..未进行修改
-
-	case 2:
-		// 查询单个学生信息
-		var id int
-		fmt.Printf("请输入查询的学生学号：")
-		_, err = fmt.Scan(&id)
-		if err != nil {
-			return err
-		}
-		err = queryRow(id)
-		if err != nil {
-			return err
-		}
-
-	case 3:
-		var (
-			id       int
-			item     string
-			newValue string //获取的newValue初始都设置成string类型，得到值后，进行类型转换
-			a        myUsualType
-		)
-		fmt.Printf("请输入修改信息的学生学号：")
-		_, err = fmt.Scan(&id)
-		if err != nil {
-			return err
-		}
-		//如果学生信息不存在，需要报错返回 查询学生信息的操作
-		err = queryRow(id)
-		if err != nil {
-			return err
-		}
-		fmt.Printf("请输入修改的信息：（字段 新值）")
-		_, err = fmt.Scan(&item, &newValue)
-		if err != nil {
-			return err
-		}
-		//将获取的item字段更改为小写
-		item = strings.ToLower(item)
-		//newValue的类型转换
-		if item == "id" || item == "age" || item == "chinese" || item == "math" || item == "english" {
-			a, err = strconv.ParseInt(newValue, 10, 0) //string 转int64
-			if err != nil {
-				return err
-			}
-		} else {
-			a = fmt.Sprintf("'%v'", newValue)
-		}
-		err = updateRow(id, item, a)
-		if err != nil {
-			return err
-		}
-
-	case 4:
-		var s Student
-		fmt.Println("请输入新增学生信息：\n", "(学号，姓名，成绩)")
-		_, err = fmt.Scan(&s.Id, &s.Name, &s.Score)
-		if err != nil {
-			return err
-		}
-		err = insertRow(s.Id, s.Name, s.Score)
-		if err != nil {
-			return err
-		}
-
-	case 5:
-		// 删除学生信息
-		var id int
-		fmt.Printf("请输入删除的学生学号：")
-		_, err = fmt.Scan(&id)
-		if err != nil {
-			return err
-		}
-		err = deleteRow(id)
-		if err != nil {
-			return err
-		}
-	default:
-		err = errors.New("输入错误！")
-		return err
-	}
-	return err
-}
->>>>>>> 688cf5ed53b85b39b20b54793577ffe795686929
-
-// 查看学生
-func queryRow(id int) (student Student, err error) {
-	var stu Student
-	err = db.QueryRow("select * from `sms` where id=?", id).Scan(&stu.Id, &stu.Name, &stu.Score)
+func register(number string, password string) (err error) {
+	currentTime := time.Now()
+	ret, err := db.Exec("INSERT INTO stu (student_id, password) VALUES (?, ?)", number, password)
 	if err != nil {
-		fmt.Printf("查询失败, err: %v\n", err)
+		log.Printf("学生账号添加失败: %v\n", err)
 		return
 	}
-	fmt.Println("查询成功!")
-	fmt.Printf("学号: %d, 姓名: %s, 分数: %d\n", stu.Id, stu.Name, stu.Score)
-	return stu, nil
+	newID, err := ret.LastInsertId()
+	if err != nil {
+		log.Printf("新注册学生ID失败: %v\n", err)
+	}
+	log.Printf("%s注册成功, 新注册的学生学号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), newID)
+	return
+}
+
+// 查看学生
+//
+//	func queryRow(number int) (student Student, err error) {
+//		var stu Student
+//		err = db.QueryRow("SELECT number, name, score FROM sms WHERE number = ?", number).Scan(&stu.Number, &stu.Name, &stu.Score)
+//		if err != nil {
+//			fmt.Printf("查询失败, err: %v\n", err)
+//			return
+//		}
+//		return stu, nil
+//	}
+func queryRow(number int) (student Student, err error) {
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	val, err := rdb.Get(timeoutCtx, fmt.Sprintf("student:%d", number)).Result()
+	if err == redis.Nil {
+		err = db.QueryRow("SELECT number, name, score FROM sms WHERE number = ?", number).Scan(&student.Number, &student.Name, &student.Score)
+		if err != nil {
+			log.Fatalf("查询失败, err: %v\n", err)
+			return
+		}
+		studentJSON, _ := json.Marshal(student)
+		err = rdb.Set(timeoutCtx, fmt.Sprintf("student:%d", number), studentJSON, 30*time.Minute).Err()
+		if err != nil {
+			log.Printf("缓存设置失败, err: %v\n", err)
+		}
+		return student, nil
+	} else if err != nil {
+		log.Printf("从Redis查询失败, err: %v\n", err)
+		return
+	} else {
+		err = json.Unmarshal([]byte(val), &student)
+		if err != nil {
+			log.Printf("反序列化失败, err: %v\n", err)
+			return
+		}
+		return student, nil
+	}
 }
 
 // 全部查看
 func queryMultiRow() ([]Student, error) {
-	rows, err := db.Query("SELECT id, name, score FROM sms")
+	var students []Student
+	ret, err := db.Query("SELECT number, name, score FROM sms")
 	if err != nil {
-		fmt.Printf("查询失败, err:%v\n", err)
+		log.Printf("查询失败, err:%v\n", err)
 		return nil, err
 	}
-	defer rows.Close()
-
-	var students []Student // 创建一个空的Student切片用于存储学生数据
-
-	for rows.Next() {
-		var stu Student // 使用Student结构体来存储每行的数据
-		err := rows.Scan(&stu.Id, &stu.Name, &stu.Score)
+	defer ret.Close()
+	for ret.Next() {
+		var stu Student
+		err := ret.Scan(&stu.Number, &stu.Name, &stu.Score)
 		if err != nil {
-			fmt.Printf("赋值失败, err:%v\n", err)
-			continue // 发生错误时继续处理下一行
+			log.Printf("赋值失败, err:%v\n", err)
+			continue
 		}
-		students = append(students, stu) // 将学生对象添加到切片中
+		students = append(students, stu)
 	}
-
-	if err := rows.Err(); err != nil {
-		fmt.Printf("iteration failed, err:%v\n", err)
+	if err := ret.Err(); err != nil {
+		log.Printf("迭代失败, err:%v\n", err)
 		return nil, err
 	}
-
-	return students, nil // 返回学生切片和错误信息
+	return students, nil
 }
 
 // 增加学生
-<<<<<<< HEAD
-func insertRow(name string, score int) error {
-	ret, err := db.Exec("INSERT INTO sms (name, score) VALUES (?, ?)", name, score)
-=======
-func insertRow(id int, name string, score int) error {
-	ret, err := db.Exec("insert into sms(id, name, score) values (?, ?, ?)", id, name, score)
->>>>>>> 688cf5ed53b85b39b20b54793577ffe795686929
+func insertRow(number int, name string, score int) (err error) {
+	currentTime := time.Now()
+	ret, err := db.Exec("INSERT INTO sms (number, name, score) VALUES (?, ?, ?)", number, name, score)
 	if err != nil {
 		fmt.Printf("添加失败, err:%v\n", err)
-		return err
+		return
 	}
-	insertedId, err := ret.LastInsertId() //获取插入操作的最后插入的自增主键
+	insertedId, err := ret.LastInsertId()
 	if err != nil {
-		fmt.Printf("获取最后插入ID失败, err:%v\n", err)
-		return err
+		fmt.Printf("获取插入ID失败, err:%v\n", err)
+		return
 	}
-	fmt.Printf("加入成功, 新加入的学生编号为：%d\n", insertedId)
-	return nil
+	log.Printf("%s 加入成功, 新加入的学生序号为：%d\n", currentTime.Format("2006/01/02 15:04:05"), insertedId)
+	return
 }
 
 // 修改学生
-func updateRow(name string, newValue myUsualType) error {
-	sqlStr := "UPDATE sms SET score = ? WHERE name = ?"
-	ret, err := db.Exec(sqlStr, newValue, name)
+func updateRow(number int, newScore myUsualType) (err error) {
+	sqlStr := "UPDATE sms SET score = ? WHERE number = ?"
+	ret, err := db.Exec(sqlStr, newScore, number)
 	if err != nil {
-		fmt.Printf("更新失败, error: %v\n", err)
-		return err
+		log.Fatalf("更新失败, error: %v\n", err)
+		return
 	}
 	rowsAffected, err := ret.RowsAffected()
 	if err != nil {
-		fmt.Printf("获取更新行数时发生错误: %v\n", err)
-		return err
+		log.Printf("获取更新行数时发生错误: %v\n", err)
+		return
 	}
 	if rowsAffected == 0 {
-		fmt.Println("没有找到对应的ID, 未进行更新")
-		return nil
+		fmt.Println("没有找到对应的学号, 未进行更新")
+		return
 	}
 	fmt.Printf("更新成功, 受影响行数:%d\n", rowsAffected)
-	return nil
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+	student, err := queryRow(number)
+	if err != nil {
+		log.Printf("从数据库获取更新后的学生信息失败, err: %v\n", err)
+		return
+	}
+
+	studentJSON, err := json.Marshal(student)
+	if err != nil {
+		log.Printf("序列化学生信息失败, err: %v\n", err)
+		return
+	}
+
+	err = rdb.Set(timeoutCtx, fmt.Sprintf("student:%d", number), studentJSON, 30*time.Minute).Err()
+	if err != nil {
+		log.Printf("更新Redis缓存失败, err: %v\n", err)
+		return
+	}
+	return
 }
 
 // 删除学生
-func deleteRow(id int) (err error) {
-	ret, err := db.Exec("delete from sms where id = ?", id)
+func deleteRow(number int) (err error) {
+	currentTime := time.Now()
+	// 首先检查学生是否存在
+	_, err = queryRow(number)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return fmt.Errorf("没有找到学号为 %d 的学生", number)
+		}
+		fmt.Printf("查询学生时出错, err: %v\n", err)
+		return
+	}
+	ret, err := db.Exec("DELETE FROM sms WHERE number = ?", number)
 	if err != nil {
 		fmt.Printf("删除失败, err:%v\n", err)
 		return
@@ -223,6 +183,9 @@ func deleteRow(id int) (err error) {
 		fmt.Printf("get RowsAffected failed, err:%v\n", err)
 		return
 	}
-	fmt.Printf("删除成功, 受影响行数:%d\n", n)
-	return err
+	if n == 0 {
+		return fmt.Errorf("没有学号为 %d 的学生", number)
+	}
+	fmt.Printf("%s 删除成功, 删除的学生学号为：%d", currentTime.Format("2006/01/02 15:04:05"), number)
+	return
 }

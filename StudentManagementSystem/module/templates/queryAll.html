@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>学生列表</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<h2>学生列表</h2>
+
+<table>
+    <tr>
+        <th>Number</th>
+        <th>Name</th>
+        <th>Score</th>
+    </tr>
+    {{range .}}
+    <tr>
+        <td>{{.Number}}</td>
+        <td>{{.Name}}</td>
+        <td>{{.Score}}</td>
+    </tr>
+    {{end}}
+</table>
+
+<a href="/home">返回主页</a>
+
+</body>
+</html>
